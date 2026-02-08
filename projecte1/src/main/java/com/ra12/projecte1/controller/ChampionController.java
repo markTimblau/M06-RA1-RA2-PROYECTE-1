@@ -1,7 +1,7 @@
 package com.ra12.projecte1.controller;
 
 import com.ra12.projecte1.model.Champion;
-import com.ra12.projecte1.services.ChampionService;
+import com.ra12.projecte1.service.ChampionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

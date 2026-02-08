@@ -27,7 +27,10 @@ public class ChampionRepository {
             champion.setId(rs.getLong("id"));
             champion.setName(rs.getString("name"));
             champion.setTitle(rs.getString("title"));
+
+            // String -> Enum
             champion.setRole(Role.valueOf(rs.getString("role")));
+
             champion.setDifficulty(rs.getString("difficulty"));
 
             Date releaseDate = rs.getDate("release_date");
@@ -44,11 +47,10 @@ public class ChampionRepository {
 
     // Obtener todos los champions
     public List<Champion> findAll() {
-        String sql = "SELECT * FROM champions";
-        return jdbcTemplate.query(sql, new ChampionRowMapper());
+        return jdbcTemplate.query("SELECT * FROM champions", new ChampionRowMapper());
     }
 
-    // Buscar champion por id
+    // Buscar por id
     public Champion findById(long id) {
         String sql = "SELECT * FROM champions WHERE id = ?";
         List<Champion> result = jdbcTemplate.query(
@@ -71,7 +73,7 @@ public class ChampionRepository {
                 sql,
                 champion.getName(),
                 champion.getTitle(),
-                champion.getRole(),
+                champion.getRole().name(),
                 champion.getDifficulty(),
                 champion.getReleaseDate(),
                 champion.getImageUrl(),
@@ -97,7 +99,7 @@ public class ChampionRepository {
                 sql,
                 champion.getName(),
                 champion.getTitle(),
-                champion.getRole(),
+                champion.getRole().name(),
                 champion.getDifficulty(),
                 champion.getReleaseDate(),
                 champion.getImageUrl(),
@@ -106,9 +108,20 @@ public class ChampionRepository {
         );
     }
 
-    // Eliminar por id
+    // [a2] Actualizar solo la imagen
+    public void updateImage(long id, String imageUrl) {
+        String sql = "UPDATE champions SET image_url = ? WHERE id = ?";
+        jdbcTemplate.update(sql, imageUrl, id);
+    }
+
+    // [d2] Eliminar por id
     public boolean deleteById(long id) {
         String sql = "DELETE FROM champions WHERE id = ?";
         return jdbcTemplate.update(sql, id) > 0;
+    }
+
+    // [c2] Eliminar TODOS
+    public void deleteAll() {
+        jdbcTemplate.update("DELETE FROM champions");
     }
 }
