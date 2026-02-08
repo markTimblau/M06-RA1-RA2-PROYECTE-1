@@ -1,6 +1,8 @@
 package com.ra12.projecte1.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,7 +17,10 @@ public class Champion {
     
     private String name;
     private String title;
-    private String role;
+    
+    @Enumerated(EnumType.STRING)
+    private Role role;
+    
     private String difficulty;
     private LocalDate releaseDate;
     private String imageUrl;
@@ -24,7 +29,7 @@ public class Champion {
     public Champion() {
     }
 
-    public Champion(String name, String title, String role, String difficulty, LocalDate releaseDate, String imageUrl, String bio) {
+    public Champion(String name, String title, Role role, String difficulty, LocalDate releaseDate, String imageUrl, String bio) {
         this.name = name;
         this.title = title;
         this.role = role;
@@ -58,11 +63,11 @@ public class Champion {
         this.title = title;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
