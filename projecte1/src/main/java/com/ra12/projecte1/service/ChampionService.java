@@ -1,12 +1,20 @@
 package com.ra12.projecte1.service;
 
 import com.ra12.projecte1.model.Champion;
+import com.ra12.projecte1.model.Role;
 import com.ra12.projecte1.repository.ChampionRepository;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -75,6 +83,44 @@ public class ChampionService {
     public void deleteAll() {
         log.info("Service - Eliminar TODOS los champions");
         championRepository.deleteAll();
+    }
+
+    // Cargar champions desde CSV
+    public int loadFromCsv(MultipartFile file) throws IOException, CsvException {
+        log.info("Service - Cargar champions desde CSV");
+
+        try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
+            List<String[]> rows = reader.readAll();
+            
+            // Saltar la primera fila si tiene encabezados
+            boolean skipHeader = true;
+            int count = 0;
+
+            for (String[] row : rows) {
+                if (skipHeader) {
+                    skipHeader = false;
+                    continue;
+                }
+
+                // Formato CSV: name,title,role,difficulty,releaseDate,imageUrl,bio
+                if (row.length >= 7) {
+                    Champion champion = new Champion();
+                    champion.setName(row[0].trim());
+                    champion.setTitle(row[1].trim());
+                    champion.setRole(Role.valueOf(row[2].trim().toUpperCase()));
+                    champion.setDifficulty(row[3].trim());
+                    champion.setReleaseDate(LocalDate.parse(row[4].trim(), DateTimeFormatter.ISO_LOCAL_DATE));
+                    champion.setImageUrl(row[5].trim());
+                    champion.setBio(row[6].trim());
+
+                    championRepository.save(champion);
+                    count++;
+                }
+            }
+
+            log.info("Service - Se cargaron {} champions desde CSV", count);
+            return count;
+        }
     }
 }
 

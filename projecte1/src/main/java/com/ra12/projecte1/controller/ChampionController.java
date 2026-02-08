@@ -2,12 +2,15 @@ package com.ra12.projecte1.controller;
 
 import com.ra12.projecte1.model.Champion;
 import com.ra12.projecte1.service.ChampionService;
+import com.opencsv.exceptions.CsvException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -99,6 +102,30 @@ public class ChampionController {
 
         championService.deleteAll();
         return ResponseEntity.ok().build();
+    }
+
+    // POST - cargar champions desde CSV
+    @PostMapping("/csv/upload")
+    public ResponseEntity<String> uploadCsv(@RequestParam("file") MultipartFile file) {
+        log.info("POST /champions/csv/upload - Cargar champions desde CSV");
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("El archivo está vacío");
+        }
+
+        try {
+            int count = championService.loadFromCsv(file);
+            return ResponseEntity.ok("Se cargaron " + count + " champions correctamente");
+        } catch (IOException e) {
+            log.error("Error al leer el archivo CSV", e);
+            return ResponseEntity.internalServerError().body("Error al leer el archivo: " + e.getMessage());
+        } catch (CsvException e) {
+            log.error("Error al procesar el CSV", e);
+            return ResponseEntity.badRequest().body("Error al procesar el CSV: " + e.getMessage());
+        } catch (Exception e) {
+            log.error("Error inesperado", e);
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 }
 
