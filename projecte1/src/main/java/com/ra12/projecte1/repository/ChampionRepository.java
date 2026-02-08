@@ -1,6 +1,7 @@
 package com.ra12.projecte1.repository;
 
 import com.ra12.projecte1.model.Champion;
+import com.ra12.projecte1.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -26,7 +27,7 @@ public class ChampionRepository {
             champion.setId(rs.getLong("id"));
             champion.setName(rs.getString("name"));
             champion.setTitle(rs.getString("title"));
-            champion.setRole(rs.getString("role"));
+            champion.setRole(Role.valueOf(rs.getString("role")));
             champion.setDifficulty(rs.getString("difficulty"));
 
             Date releaseDate = rs.getDate("release_date");
